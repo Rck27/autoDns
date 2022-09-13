@@ -37,7 +37,7 @@ echo "thanks, made with ❤ . Erik Pratama"
 
 RNS () {
 sudo cat <<EOF>>/etc/bind/zone/reverse.db.$domain
-$hostRev	IN	PTR	$subdomain.$domain
+$hostRev	IN	PTR	$subdomain.$domain.
 EOF
 }
 
