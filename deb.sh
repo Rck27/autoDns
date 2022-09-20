@@ -31,7 +31,8 @@ do
 done
  systemctl restart bind9
  systemctl status bind9
-echo "thanks, made with ❤ . Erik Pratama"
+#echo "thanks, made with ❤ . Erik Pratama"
+echo "thanks. Erik Pratama
 }
 
 
