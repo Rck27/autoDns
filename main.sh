@@ -3,46 +3,80 @@ dir="/etc/bind"
 continue="Y"
 index=0
 #TTL="$TTL"
-sudo mkdir $dir/zone;
+ mkdir $dir/zone;
+
+TEST () {
+	if [[ $? ]]; then
+		exit 1
+	fi
+}
+
+resolv () {
+	read -p "Input your server's IP Address : " ip
+	cat <<EOF>>/etc/resolv.conf
+	nameserver $ip
+EOF
+	/etc/init.d/networking restart
+}
+
+clear
+figlet -f mono12 AutoDNS
+#figlet -f letter github.com/rck27/autodns
 
 read -p "delete previous data? Y/N " del
 if [ $del == "Y" ] || [ $del == "y" ]
 then
-	sudo rm $dir/named.conf.local
-	sudo rm -r $dir/zone
-	sudo mkdir $dir/zone
+	 rm $dir/named.conf.local
+	#TEST
+	 rm -r $dir/zone
+	 mkdir $dir/zone
 	echo "deleted"
 fi
+read -p "Setup your DNS nameserver? Y/N " set
+if [ $set == "Y" ] || [ $set == "y" ]; then
+	resolv
+fi
+
 
 addNS () {
 while [ $continue == "Y" ] || [ $continue == "y" ];
 do
 	
 	echo "$index - Name Server"
-	read -p "input subdomain (ex. sub.  $domain<): " subdomain
-	read -p "input host address 1st octet " oct1
-	read -p "input host address 2nd octet " oct2
+	if [[ $index == 0 ]]; then
+		subdomain="ns1"
+		echo "the first subdomain is ns1."
+	elif [[ $index != 0 ]]; then
+		read -p "input subdomain (ex. web.$domain<): " subdomain
+
+	fi
+	# read -p "input subdomain (ex. sub.  $domain<): " subdomain
+	read -p "input host address 1st octet (ex. xxx.xxx.1.xxx) " oct1
+	read -p "input host address 2nd octet (ex. xxx.xxx.xxx.1) " oct2
 	hostRev="$oct2.$oct1"
 	host="$oct1.$oct2"
 	NS
 	RNS
 	read -p "continue? Y/N " continue
+	#TEST
 	index+=1
 done
-sudo systemctl restart bind9
-sudo systemctl status bind9
+ systemctl restart bind9
+ systemctl status bind9
+echo "----------------------------------"
 echo "thanks, made with ❤ . Erik Pratama"
+echo "https://github.com/rck27/AutoDNS"
 }
 
 
 RNS () {
-sudo cat <<EOF>>/etc/bind/zone/reverse.db.$domain
-$hostRev	IN	PTR	$subdomain.$domain.
+ cat <<EOF>>/etc/bind/zone/reverse.db.$domain
+$hostRev	IN	PTR	$subdomain.$domain
 EOF
 }
 
 NS () {
-sudo cat <<EOF>>/etc/bind/zone/db.$domain
+ cat <<EOF>>/etc/bind/zone/db.$domain
 $subdomain	IN	A	$net.$host
 EOF
 }
@@ -50,7 +84,7 @@ EOF
 
 
 zone () {
-sudo cat <<EOF>>/etc/bind/named.conf.local
+ cat <<EOF>>/etc/bind/named.conf.local
 zone "$domain" {
 	type master;
 	file "$dir/zone/db.$domain";
@@ -63,8 +97,8 @@ EOF
 }
 
 db () {
-sudo touch $1
-sudo cat <<EOF>>$1
+ touch $1
+ cat <<EOF>>$1
 \$TTL    604800
 @       IN      SOA     ns1.$domain. root.$domain. (
                               2         ; Serial
@@ -75,6 +109,7 @@ sudo cat <<EOF>>$1
 ;
 @       IN      NS      ns1.$domain.
 EOF
+
 }
 
 rem() {
@@ -85,8 +120,8 @@ rm -r $dir/zone;
 
 
 read -p "input domain (ex. deric.com): " domain;
-read -p "input 1st octet network prefix: " oct1;
-read -p "input 2nd octet network prefix: " oct2;
+read -p "input 1st octet network prefix: (ex. 192.xxx.xxx.xxx)  " oct1;
+read -p "input 2nd octet network prefix: (ex. xxx.168.xxx.xxx) " oct2;
 #domain="de.ric.p"
 
 #net="10.12"
@@ -98,8 +133,15 @@ zone
 
 #d="/etc/bind/zones/db.$domain"
 #db="/etc/bind/zones/reverse.db.$domain"
+# if [[ db "/etc/bind/zone/db.$domain" == 1 ]]; then
+# 	echo "failed";
+# 	exit
+# fi
 db "/etc/bind/zone/db.$domain"
 db "/etc/bind/zone/reverse.db.$domain"
+#TEST
 echo "success, continuing to next step..."
 addNS
+# db "/etc/bind/zone/db.$domain"
+# db "/etc/bind/zone/reverse.db.$domain"
 
