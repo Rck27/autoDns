@@ -20,7 +20,7 @@ EOF
 }
 
 clear
-figlet -f mono12 AutoDNS
+figlet -d ./mono12.tlf -f mono12.tlf AutoDNS
 #figlet -f letter github.com/rck27/autodns
 
 read -p "delete previous data? Y/N " del
