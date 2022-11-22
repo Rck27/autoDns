@@ -130,6 +130,12 @@ net="$oct1.$oct2"
 netReverse="$oct2.$oct1"
 
 zone
+db "/etc/bind/zone/db.$domain" A
+db "/etc/bind/zone/reverse.db.$domain"
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 #d="/etc/bind/zones/db.$domain"
 #db="/etc/bind/zones/reverse.db.$domain"
@@ -137,8 +143,7 @@ zone
 # 	echo "failed";
 # 	exit
 # fi
-db "/etc/bind/zone/db.$domain"
-db "/etc/bind/zone/reverse.db.$domain"
+
 #TEST
 echo "success, continuing to next step..."
 addNS
