@@ -71,7 +71,7 @@ echo "https://github.com/rck27/AutoDNS"
 
 RNS () {
  cat <<EOF>>/etc/bind/zone/reverse.db.$domain
-$hostRev	IN	PTR	$subdomain.$domain
+$hostRev	IN	PTR	$subdomain.$domain.
 EOF
 }
 
